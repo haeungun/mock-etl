@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+}
+
+group 'mock-etl'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.json/json
+    compile group: 'org.json', name: 'json', version: '20180813'
+
+    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.7.2'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.12'
+}
+
