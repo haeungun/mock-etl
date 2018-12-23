@@ -10,5 +10,5 @@ before_script:
   - ./gradlew assemble
 
 script:
-  - ./gradlew test
+  - ./gradlew test -i
   - ./gradlew build
