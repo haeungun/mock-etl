@@ -3,7 +3,6 @@ package com.example.mocketl;
 import com.example.mocketl.util.PropertyUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ApplicationConfig {
@@ -21,7 +20,6 @@ public class ApplicationConfig {
     private final int pollTimeout;
     private final int queueCapacity;
     private final int recordCount;
-    private final int statsThreadCount;
     private final String[] topicNames;
 
 
@@ -41,7 +39,6 @@ public class ApplicationConfig {
         this.pollTimeout = propertyUtil.getIntValue("poll.wait.timeout");
         this.queueCapacity = propertyUtil.getIntValue("queue.capacity");
         this.recordCount = propertyUtil.getIntValue("stats.record.count");
-        this.statsThreadCount = propertyUtil.getIntValue("stats.thread.count");
 
         this.topicNames = propertyUtil.getStringValue("queue.topics").split("\\|");
     }
@@ -90,10 +87,6 @@ public class ApplicationConfig {
 
     public int getRecordCount() {
         return this.recordCount;
-    }
-
-    public int getStatsThreadCount() {
-        return this.statsThreadCount;
     }
 
     public String[] getTopicNames() {

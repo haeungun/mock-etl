@@ -57,6 +57,7 @@ public abstract class StatsPaymentConsumer implements Consumer {
             }
         }
 
+        if (this.userLogs.size() > 0) this.savePaymentState();
         logger.info("StatsPaymentConsumer is exit ..");
     }
 

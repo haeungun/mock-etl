@@ -1,5 +1,6 @@
 package com.example.mocketl.database;
 
+import com.example.mocketl.model.StatsPayment;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,9 +20,10 @@ public class StatsCountryDaoTest {
                                                         + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                                                         + "ts DATETIME DEFAULT CURRENT_TIMESTAMP, "
                                                         + "country VARCHAR(255), "
+                                                        + "userCount BIGINT, "
                                                         + "payment BIGINT);"
                                                     + "CREATE INDEX idxTs ON statsPaymentPerCountry(ts);";
-    private static final String SELECT_STAT_COUNTRY = "SELECT SUM(payment) AS payment "
+    private static final String SELECT_STAT_COUNTRY = "SELECT SUM(payment) AS payment, SUM(userCount) AS userCount "
                                                         + "FROM statsPaymentPerCountry "
                                                         + "WHERE country = ?;";
     @Rule
@@ -59,12 +61,13 @@ public class StatsCountryDaoTest {
     public void insertCountryStats_테스트() throws SQLException {
         String[] expectedCountries = {"MyCountry1", "MyCountry2"};
         int[] expectedCount = {10, 50};
+        int[] expectedPayment = {2, 3};
 
         StatsCountryPaymentDao dao = new StatsCountryPaymentDao(this.dbUrl);
-        dao.insertOne(expectedCountries[0], 5);
-        dao.insertOne(expectedCountries[1], 25);
-        dao.insertOne(expectedCountries[0], 5);
-        dao.insertOne(expectedCountries[1], 25);
+        dao.insertOne(new StatsPayment(expectedCountries[0], 5, 1));
+        dao.insertOne(new StatsPayment(expectedCountries[1], 25, 1));
+        dao.insertOne(new StatsPayment(expectedCountries[0], 5, 1));
+        dao.insertOne(new StatsPayment(expectedCountries[1], 25, 2));
 
         ConnectionManager cm = new ConnectionManager(this.dbUrl);
 
@@ -78,8 +81,10 @@ public class StatsCountryDaoTest {
                 pstmt.setString(1, expectedCountries[i]);
                 rs = pstmt.executeQuery();
 
-                int count = rs.getInt("payment");
+                int count = rs.getInt("userCount");
+                int payment = rs.getInt("payment");
                 assertEquals(expectedCount[i], count);
+                assertEquals(expectedPayment[i], payment);
             }
         } catch (Exception e) {
             // TODO handling error
