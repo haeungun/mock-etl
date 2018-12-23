@@ -2,6 +2,7 @@ package com.example.mocketl.consumer;
 
 import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.database.StatsCountryPaymentDao;
+import com.example.mocketl.model.StatsPayment;
 import com.example.mocketl.model.UserLog;
 
 import java.util.HashMap;
@@ -18,21 +19,27 @@ public class StatsCountryConsumer extends StatsPaymentConsumer {
 
     @Override
     protected boolean savePaymentState() {
-        Map<String, Integer> stats = new HashMap<>();
+        Map<String, Integer> payments = new HashMap<>();
+        Map<String, Integer> userCounts = new HashMap<>();
 
         for (UserLog userLog : this.userLogs) {
             String country = userLog.getCountry();
-            int payment = stats.getOrDefault(country, 0);
+            int payment = payments.getOrDefault(country, 0);
+            int userCount = userCounts.getOrDefault(country, 0);
             payment += userLog.getPayment();
-            stats.put(country, payment);
+            payments.put(country, payment);
+            userCounts.put(country, ++userCount);
         }
 
         int savedCount = 0;
-        int numOfCountry = stats.size();
-        for (Map.Entry<String, Integer> entry : stats.entrySet()) {
+        int numOfCountry = payments.size();
+        for (Map.Entry<String, Integer> entry : payments.entrySet()) {
             String country = entry.getKey();
             int amountOfPayment = entry.getValue();
-            savedCount += this.dao.insertOne(country, amountOfPayment);
+            int amountOfUserCount = userCounts.get(country);
+
+            StatsPayment payment = new StatsPayment(country, amountOfUserCount, amountOfPayment);
+            savedCount += this.dao.insertOne(payment);
         }
 
         return numOfCountry == savedCount;

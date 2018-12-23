@@ -3,6 +3,7 @@ CREATE TABLE statsPaymentPerCountry (
   id INTEGER PRIMARY KEY AUTOINCREMENT, /* sqlite autoincrement support only integer */
   ts DATETIME DEFAULT CURRENT_TIMESTAMP,
   country VARCHAR(255),
+  userCount BIGINT,
   payment BIGINT
 );
 
@@ -14,6 +15,7 @@ CREATE TABLE statsPaymentPerGender (
   id INTEGER PRIMARY KEY AUTOINCREMENT, /* sqlite autoincrement support only integer */
   ts DATETIME DEFAULT CURRENT_TIMESTAMP,
   gender VARCHAR(36),
+  userCount BIGINT,
   payment BIGINT
 );
 

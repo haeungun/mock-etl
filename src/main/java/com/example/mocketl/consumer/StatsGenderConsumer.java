@@ -3,6 +3,7 @@ package com.example.mocketl.consumer;
 import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.database.PaymentDao;
 import com.example.mocketl.database.StatsGenderPaymentDao;
+import com.example.mocketl.model.StatsPayment;
 import com.example.mocketl.model.UserLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,21 +25,27 @@ public class StatsGenderConsumer extends StatsPaymentConsumer {
 
     @Override
     protected boolean savePaymentState() {
-        Map<String, Integer> stats = new HashMap<>();
+        Map<String, Integer> payments = new HashMap<>();
+        Map<String, Integer> userCounts = new HashMap<>();
 
         for (UserLog userLog : this.userLogs) {
-            String country = userLog.getGender();
-            int payment = stats.getOrDefault(country, 0);
+            String gender = userLog.getGender();
+            int payment = payments.getOrDefault(gender, 0);
+            int userCount = userCounts.getOrDefault(gender, 0);
             payment += userLog.getPayment();
-            stats.put(country, payment);
+            payments.put(gender, payment);
+            userCounts.put(gender, ++userCount);
         }
 
         int savedCount = 0;
-        int numOfCountry = stats.size();
-        for (Map.Entry<String, Integer> entry : stats.entrySet()) {
-            String country = entry.getKey();
+        int numOfCountry = payments.size();
+        for (Map.Entry<String, Integer> entry : payments.entrySet()) {
+            String gender = entry.getKey();
             int amountOfPayment = entry.getValue();
-            savedCount += this.dao.insertOne(country, amountOfPayment);
+            int amountOfUserCount = userCounts.get(gender);
+
+            StatsPayment payment = new StatsPayment(gender, amountOfUserCount, amountOfPayment);
+            savedCount += this.dao.insertOne(payment);
         }
 
         return numOfCountry == savedCount;
