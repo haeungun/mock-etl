@@ -5,6 +5,8 @@ Let's implement Mock ETL project with mock message queue and mock database.
 
 ## Data source
 Random generated user log from [mockaroo.com](https://mockaroo.com/)
+**Mockaroo API has limitation with free plan which is can be called 1000 times per a day.**
+If you want to test in your local machine, please add a new API endpoint on mockaroo.
 
 ## Doing what?
 Retrive user log data from REST API and get statistics per given time
