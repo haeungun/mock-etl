@@ -53,20 +53,20 @@ public class ConsumerHandler {
 
 	// TODO(haeungun): Refactoring registerStatsXX
 	private void registerStatsCountryConsumer() {
-		String dbUrl = this.context.getConfig().getDbUrl();
+        String dbUrl = this.context.getConfig().getDbUrl();
         String topicName = "country";
-		StatsCountryPaymentDao dao = new StatsCountryPaymentDao(dbUrl);
+        StatsCountryPaymentDao dao = new StatsCountryPaymentDao(dbUrl);
         BlockingQueue<UserLog> countryQueue = this.queue.getQueueByTopicName(topicName);
-		Consumer consumer = new StatsCountryConsumer(this.context, countryQueue, dao);
-		this.executor.execute(consumer);
+        Consumer consumer = new StatsCountryConsumer(this.context, countryQueue, dao);
+        this.executor.execute(consumer);
 	}
 
 	private void registerStatsGenderConsumer() {
-		String dbUrl = this.context.getConfig().getDbUrl();
+        String dbUrl = this.context.getConfig().getDbUrl();
         String topicName = "gender";
-		StatsGenderPaymentDao dao = new StatsGenderPaymentDao(dbUrl);
-		BlockingQueue<UserLog> genderQueue  = this.queue.getQueueByTopicName(topicName);
-		Consumer consumer = new StatsGenderConsumer(this.context, genderQueue, dao);
-		this.executor.execute(consumer);
+        StatsGenderPaymentDao dao = new StatsGenderPaymentDao(dbUrl);
+        BlockingQueue<UserLog> genderQueue  = this.queue.getQueueByTopicName(topicName);
+        Consumer consumer = new StatsGenderConsumer(this.context, genderQueue, dao);
+        this.executor.execute(consumer);
 	}
 }
