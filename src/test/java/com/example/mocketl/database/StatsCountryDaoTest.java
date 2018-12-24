@@ -1,6 +1,6 @@
 package com.example.mocketl.database;
 
-import com.example.mocketl.model.StatsPayment;
+import com.example.mocketl.model.PaymentStats;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,10 +64,10 @@ public class StatsCountryDaoTest {
         int[] expectedPayment = {2, 3};
 
         StatsCountryPaymentDao dao = new StatsCountryPaymentDao(this.dbUrl);
-        dao.insertOne(new StatsPayment(expectedCountries[0], 5, 1));
-        dao.insertOne(new StatsPayment(expectedCountries[1], 25, 1));
-        dao.insertOne(new StatsPayment(expectedCountries[0], 5, 1));
-        dao.insertOne(new StatsPayment(expectedCountries[1], 25, 2));
+        dao.insertOne(new PaymentStats(expectedCountries[0], 5, 1));
+        dao.insertOne(new PaymentStats(expectedCountries[1], 25, 1));
+        dao.insertOne(new PaymentStats(expectedCountries[0], 5, 1));
+        dao.insertOne(new PaymentStats(expectedCountries[1], 25, 2));
 
         ConnectionManager cm = new ConnectionManager(this.dbUrl);
 

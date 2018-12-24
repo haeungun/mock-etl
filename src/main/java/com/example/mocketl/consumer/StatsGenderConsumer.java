@@ -1,26 +1,21 @@
 package com.example.mocketl.consumer;
 
 import com.example.mocketl.ApplicationContext;
-import com.example.mocketl.database.PaymentDao;
 import com.example.mocketl.database.StatsGenderPaymentDao;
-import com.example.mocketl.model.StatsPayment;
+import com.example.mocketl.model.PaymentStats;
 import com.example.mocketl.model.UserLog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.mocketl.queue.TopicQueue;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
-public class StatsGenderConsumer extends StatsPaymentConsumer {
+public class StatsGenderConsumer extends AbstractPaymentConsumer {
 
     public StatsGenderConsumer(ApplicationContext context,
-                               BlockingQueue<UserLog> queue,
+                               TopicQueue<UserLog> queue,
+                               String topicName,
                                StatsGenderPaymentDao dao) {
-        super(context, queue, dao);
+        super(context, queue, topicName, dao);
     }
 
     @Override
@@ -44,7 +39,7 @@ public class StatsGenderConsumer extends StatsPaymentConsumer {
             int amountOfPayment = entry.getValue();
             int amountOfUserCount = userCounts.get(gender);
 
-            StatsPayment payment = new StatsPayment(gender, amountOfUserCount, amountOfPayment);
+            PaymentStats payment = new PaymentStats(gender, amountOfUserCount, amountOfPayment);
             savedCount += this.dao.insertOne(payment);
         }
 

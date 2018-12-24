@@ -4,7 +4,10 @@ import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.database.ConnectionManager;
 import com.example.mocketl.database.StatsCountryPaymentDao;
 import com.example.mocketl.database.StatsGenderPaymentDao;
+import com.example.mocketl.enums.ExecuteState;
 import com.example.mocketl.model.UserLog;
+import com.example.mocketl.queue.MemoryQueue;
+import com.example.mocketl.queue.TopicQueue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,13 +43,15 @@ public class StatsGenderConsumerTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private String dbUrl;
+    private String topicName;
     private StatsGenderPaymentDao dao;
-    private BlockingQueue<UserLog> queue;
+    private TopicQueue<UserLog> queue;
 
     public StatsGenderConsumerTest() throws Exception {
         this.context = new ApplicationContext();
         this.mockUserLog = new MockUserLog();
         this.queueCapacity = 50;
+        this.topicName = "testTopic";
     }
 
     @Before
@@ -54,11 +59,11 @@ public class StatsGenderConsumerTest {
         this.temporaryFolder.create();
         this.dbUrl = "jdbc:sqlite:" + this.temporaryFolder.getRoot().getAbsolutePath() + "/test.db";
         this.dao = new StatsGenderPaymentDao(this.dbUrl);
-        this.queue = new ArrayBlockingQueue<>(this.queueCapacity);
+        this.queue = new MemoryQueue<>(this.queueCapacity);
 
         List<UserLog> mock = this.mockUserLog.getMock();
         for (UserLog m : mock) {
-            this.queue.put(m);
+            this.queue.produce(this.topicName, m);
         }
 
         ConnectionManager cm = new ConnectionManager(this.dbUrl);
@@ -82,11 +87,14 @@ public class StatsGenderConsumerTest {
     }
 
     @Test
-    public void savePaymentState() throws InterruptedException {
-        Consumer consumer = new StatsGenderConsumer(this.context, this.queue, this.dao);
+    public void 성별별_저장된_payment값_확인() throws InterruptedException {
+        this.context.setConsumerState(ExecuteState.RUNNING);
+        Consumer consumer = new StatsGenderConsumer(this.context, this.queue, this.topicName, this.dao);
 
         Thread thread = new Thread(consumer);
         thread.start();
+        Thread.sleep(500); // wait to consuming ..
+        this.context.setConsumerState(ExecuteState.STOP);
         thread.join();
 
         ConnectionManager cm = new ConnectionManager(this.dbUrl);

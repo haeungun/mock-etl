@@ -5,38 +5,23 @@ import com.example.mocketl.enums.ExecuteState;
 public class ApplicationContext {
 
 	private final ApplicationConfig config;
-	private ExecuteState producerState;
-	private ExecuteState consumerState;
+	private ExecuteState executeState;
 	
-	public ApplicationContext() throws Exception {
+	public ApplicationContext() {
 		this.config = new ApplicationConfig();
-		this.producerState = ExecuteState.READY;
-		this.consumerState = ExecuteState.READY;
+		this.executeState = ExecuteState.READY;
 	}
 
 	public void setState(ExecuteState state) {
-		this.setProducerState(state);
 		this.setConsumerState(state);
-	}
-
-	public void setProducerState(ExecuteState state) {
-		this.producerState = state;
 	}
 	
 	public void setConsumerState(ExecuteState state) {
-		this.consumerState = state;
+		this.executeState = state;
 	}
-	
-	public boolean isProducerRunning() {
-		return ExecuteState.RUNNING == this.producerState;
-	}
-	
-	public boolean isConsumerRunning() {
-		return ExecuteState.RUNNING == this.consumerState;
-	}
-	
+
 	public boolean isRunning() {
-		return this.isProducerRunning() && this.isConsumerRunning();
+		return ExecuteState.RUNNING == this.executeState;
 	}
 	
 	public ApplicationConfig getConfig() {

@@ -5,6 +5,7 @@ import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.exceptions.MockEtlJsonConvertException;
 import com.example.mocketl.model.UserLog;
 import com.example.mocketl.queue.MemoryQueue;
+import com.example.mocketl.queue.TopicQueue;
 import com.example.mocketl.util.IRequest;
 import com.example.mocketl.util.JsonParser;
 import org.json.JSONArray;
@@ -55,7 +56,7 @@ class DummyApiRequest implements IRequest {
     }
 
     @Override
-    public String requestGet(String path, Map<String, String> header) throws IOException {
+    public String requestGet(String path, Map<String, String> header) {
         return this.dummy;
     }
 
@@ -66,10 +67,10 @@ class DummyApiRequest implements IRequest {
 }
 
 public class UserApiProducerTest {
-    private final String topicName = "test";
+    private final String topicName = "country";
 
     private ApplicationContext context;
-    private MemoryQueue<UserLog> queue;
+    private TopicQueue<UserLog> queue;
     private DummyApiRequest dummyApi;
 
     @Before
@@ -78,27 +79,29 @@ public class UserApiProducerTest {
 
         this.context = new ApplicationContext();
         this.queue = new MemoryQueue<>(capacity);
-        this.queue.createTopic(this.topicName);
         this.dummyApi = new DummyApiRequest();
     }
 
     @Test
     public void ApiProducer_실행테스트() throws InterruptedException {
+        List<UserLog> expectedBaseDocuments = this.dummyApi.getExpectedBaseDocuments();
+        int expectedSize = expectedBaseDocuments.size();
+
         Producer producer = new UserApiProducer(this.context, this.queue, this.dummyApi);
 
         Thread thread = new Thread(producer);
         thread.start();
         thread.join();
 
-        List<UserLog> expectedBaseDocuments = this.dummyApi.getExpectedBaseDocuments();
-        int expectedSize = expectedBaseDocuments.size();
+        int consumedCount = 0;
+        UserLog consumedLog = null;
+        do  {
+            consumedLog = this.queue.consume(this.topicName, 1);
+            if (consumedLog == null) break;
+            assertEquals(expectedBaseDocuments.get(consumedCount++), consumedLog);
+        } while (consumedLog != null);
 
-        assertEquals(expectedSize, this.queue.topicSize(this.topicName));
-
-        for (int i = 0; i < expectedSize; i++) {
-            UserLog document = this.queue.consume(this.topicName, 1);
-            assertEquals(expectedBaseDocuments.get(i), document);
-        }
+        assertEquals(expectedSize, consumedCount);
     }
 
 }

@@ -4,11 +4,10 @@ import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.database.StatsCountryPaymentDao;
 import com.example.mocketl.database.StatsGenderPaymentDao;
 import com.example.mocketl.model.UserLog;
-import com.example.mocketl.queue.MemoryQueue;
+import com.example.mocketl.queue.TopicQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -17,10 +16,10 @@ public class ConsumerHandler {
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerHandler.class);
 
 	private final ApplicationContext context;
-	private final MemoryQueue<UserLog> queue;
+	private final TopicQueue<UserLog> queue;
 	private final ExecutorService executor;
 
-	public ConsumerHandler(ApplicationContext context, MemoryQueue<UserLog> queue) {
+	public ConsumerHandler(ApplicationContext context, TopicQueue<UserLog> queue) {
 		this.context = context;
 		this.queue = queue;
 		this.executor = Executors.newCachedThreadPool();
@@ -56,8 +55,7 @@ public class ConsumerHandler {
         String dbUrl = this.context.getConfig().getDbUrl();
         String topicName = "country";
         StatsCountryPaymentDao dao = new StatsCountryPaymentDao(dbUrl);
-        BlockingQueue<UserLog> countryQueue = this.queue.getQueueByTopicName(topicName);
-        Consumer consumer = new StatsCountryConsumer(this.context, countryQueue, dao);
+        Consumer consumer = new StatsCountryConsumer(this.context,this.queue, topicName, dao);
         this.executor.execute(consumer);
 	}
 
@@ -65,8 +63,7 @@ public class ConsumerHandler {
         String dbUrl = this.context.getConfig().getDbUrl();
         String topicName = "gender";
         StatsGenderPaymentDao dao = new StatsGenderPaymentDao(dbUrl);
-        BlockingQueue<UserLog> genderQueue  = this.queue.getQueueByTopicName(topicName);
-        Consumer consumer = new StatsGenderConsumer(this.context, genderQueue, dao);
+        Consumer consumer = new StatsGenderConsumer(this.context, this.queue, topicName, dao);
         this.executor.execute(consumer);
 	}
 }

@@ -3,7 +3,10 @@ package com.example.mocketl.consumer;
 import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.database.ConnectionManager;
 import com.example.mocketl.database.StatsCountryPaymentDao;
+import com.example.mocketl.enums.ExecuteState;
 import com.example.mocketl.model.UserLog;
+import com.example.mocketl.queue.MemoryQueue;
+import com.example.mocketl.queue.TopicQueue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,8 +17,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import static org.junit.Assert.*;
 
@@ -40,13 +41,15 @@ public class StatsCountryConsumerTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private String dbUrl;
+    private String topicName;
     private StatsCountryPaymentDao dao;
-    private BlockingQueue<UserLog> queue;
+    private TopicQueue<UserLog> queue;
 
     public StatsCountryConsumerTest() throws Exception {
         this.context = new ApplicationContext();
         this.mockUserLog = new MockUserLog();
-        this.queueCapacity = 50;
+        this.queueCapacity = 30;
+        this.topicName = "testTopic";
     }
 
     @Before
@@ -54,11 +57,11 @@ public class StatsCountryConsumerTest {
         this.temporaryFolder.create();
         this.dbUrl = "jdbc:sqlite:" + this.temporaryFolder.getRoot().getAbsolutePath() + "/test.db";
         this.dao = new StatsCountryPaymentDao(this.dbUrl);
-        this.queue = new ArrayBlockingQueue<>(this.queueCapacity);
+        this.queue = new MemoryQueue<>(this.queueCapacity);
 
         List<UserLog> mock = this.mockUserLog.getMock();
         for (UserLog m : mock) {
-            this.queue.put(m);
+            this.queue.produce(this.topicName, m);
         }
 
         ConnectionManager cm = new ConnectionManager(this.dbUrl);
@@ -82,11 +85,14 @@ public class StatsCountryConsumerTest {
     }
 
     @Test
-    public void savePaymentState() throws InterruptedException {
-        Consumer consumer = new StatsCountryConsumer(this.context, this.queue, this.dao);
+    public void 나라별_저장된_payment값_확인() throws InterruptedException {
+        this.context.setConsumerState(ExecuteState.RUNNING);
+        Consumer consumer = new StatsCountryConsumer(this.context, this.queue, this.topicName, this.dao);
 
         Thread thread = new Thread(consumer);
         thread.start();
+        Thread.sleep(500); // wait to consuming ..
+        this.context.setConsumerState(ExecuteState.STOP);
         thread.join();
 
         ConnectionManager cm = new ConnectionManager(this.dbUrl);

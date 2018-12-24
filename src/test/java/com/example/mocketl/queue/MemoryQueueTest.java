@@ -1,8 +1,6 @@
 package com.example.mocketl.queue;
 
 import com.example.mocketl.ApplicationConfig;
-import com.example.mocketl.model.UserLog;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,23 +17,11 @@ public class MemoryQueueTest {
     }
 
     @Test
-    public void 토픽_생성_테스트() {
-        MemoryQueue queue = new MemoryQueue(this.capacity);
-
-        String topicName = "test";
-        queue.createTopic(topicName);
-
-        assertTrue(queue.hasTopic(topicName));
-    }
-
-    @Test
     public void 토픽별_생산_소비_테스트() {
+        MemoryQueue<String> queue = new MemoryQueue<>(this.capacity);
+
         String topic1 = "topic1";
         String topic2 = "topic2";
-
-        MemoryQueue<String> queue = new MemoryQueue<>(this.capacity);
-        queue.createTopic(topic1);
-        queue.createTopic(topic2);
 
         String str1 = "abcde";
         String str2 = "fghij";

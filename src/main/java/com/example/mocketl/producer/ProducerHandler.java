@@ -2,7 +2,7 @@ package com.example.mocketl.producer;
 
 import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.model.UserLog;
-import com.example.mocketl.queue.MemoryQueue;
+import com.example.mocketl.queue.TopicQueue;
 import com.example.mocketl.util.IRequest;
 import com.example.mocketl.util.RequestApi;
 import org.slf4j.Logger;
@@ -16,11 +16,11 @@ public class ProducerHandler {
 	private static final Logger logger = LoggerFactory.getLogger(ProducerHandler.class);
 
 	private final ApplicationContext context;
-	private final MemoryQueue<UserLog> queue;
+	private final TopicQueue<UserLog> queue;
 	private final ScheduledExecutorService executor;
 	private final int produceTerm;
 
-	public ProducerHandler(ApplicationContext context, MemoryQueue<UserLog> queue) {
+	public ProducerHandler(ApplicationContext context, TopicQueue<UserLog> queue) {
 		this.context = context;
 		this.queue = queue;
 		this.executor = Executors.newSingleThreadScheduledExecutor();
