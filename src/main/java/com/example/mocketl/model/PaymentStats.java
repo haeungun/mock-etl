@@ -1,12 +1,12 @@
 package com.example.mocketl.model;
 
-public class StatsPayment {
+public class PaymentStats {
 
     private final String name;
     private final int userCount;
     private final int payment;
 
-    public StatsPayment(String name, int userCount, int payment) {
+    public PaymentStats(String name, int userCount, int payment) {
         this.name = name;
         this.userCount = userCount;
         this.payment = payment;

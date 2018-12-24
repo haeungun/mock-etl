@@ -2,19 +2,20 @@ package com.example.mocketl.consumer;
 
 import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.database.StatsCountryPaymentDao;
-import com.example.mocketl.model.StatsPayment;
+import com.example.mocketl.model.PaymentStats;
 import com.example.mocketl.model.UserLog;
+import com.example.mocketl.queue.TopicQueue;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 
-public class StatsCountryConsumer extends StatsPaymentConsumer {
+public class StatsCountryConsumer extends AbstractPaymentConsumer {
 
     public StatsCountryConsumer(ApplicationContext context,
-                                BlockingQueue<UserLog> queue,
+                                TopicQueue<UserLog> queue,
+                                String topicName,
                                 StatsCountryPaymentDao dao) {
-        super(context, queue, dao);
+        super(context, queue, topicName, dao);
     }
 
     @Override
@@ -38,7 +39,7 @@ public class StatsCountryConsumer extends StatsPaymentConsumer {
             int amountOfPayment = entry.getValue();
             int amountOfUserCount = userCounts.get(country);
 
-            StatsPayment payment = new StatsPayment(country, amountOfUserCount, amountOfPayment);
+            PaymentStats payment = new PaymentStats(country, amountOfUserCount, amountOfPayment);
             savedCount += this.dao.insertOne(payment);
         }
 

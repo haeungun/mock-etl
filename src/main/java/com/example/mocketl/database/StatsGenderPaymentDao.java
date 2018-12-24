@@ -1,6 +1,6 @@
 package com.example.mocketl.database;
 
-import com.example.mocketl.model.StatsPayment;
+import com.example.mocketl.model.PaymentStats;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +18,7 @@ public class StatsGenderPaymentDao implements PaymentDao {
     }
 
     @Override
-    public int insertOne(StatsPayment statsPayment) {
+    public int insertOne(PaymentStats statsPayment) {
         int numOfInserted = 0;
 
         String query = INSERT_QUERY.replace("$tableName", TABLE_NAME);

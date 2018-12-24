@@ -3,43 +3,45 @@ package com.example.mocketl.consumer;
 import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.database.PaymentDao;
 import com.example.mocketl.model.UserLog;
+import com.example.mocketl.queue.TopicQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
-public abstract class StatsPaymentConsumer implements Consumer {
-    private static final Logger logger = LoggerFactory.getLogger(StatsPaymentConsumer.class);
+public abstract class AbstractPaymentConsumer implements Consumer {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractPaymentConsumer.class);
 
     private final ApplicationContext context;
-    private final BlockingQueue<UserLog> queue;
+    private final TopicQueue<UserLog> queue;
 
     private final int pollTimeout;
     private final int recordCount;
+    private final String topicName;
 
     protected final PaymentDao dao;
     protected final List<UserLog> userLogs;
 
-    public StatsPaymentConsumer(ApplicationContext context,
-                                BlockingQueue<UserLog> queue,
-                                PaymentDao dao) {
+    public AbstractPaymentConsumer(ApplicationContext context,
+                                   TopicQueue<UserLog> queue,
+                                   String topicName,
+                                   PaymentDao dao) {
         this.context = context;
         this.queue = queue;
         this.dao = dao;
         this.userLogs = new ArrayList<>();
+        this.topicName = topicName;
         this.pollTimeout = context.getConfig().getPollTimeout();
         this.recordCount = context.getConfig().getRecordCount();
     }
 
     @Override
     public void run() {
-        while (this.context.isConsumerRunning() || !this.queue.isEmpty()) {
+        UserLog userLog = null;
+        while (this.context.isRunning() || userLog != null) {
             try {
-                UserLog userLog = this.queue.poll(pollTimeout, TimeUnit.SECONDS);
-
+                userLog = this.queue.consume(this.topicName, this.pollTimeout);
                 if (userLog != null) {
                     logger.info(userLog.toString());
                     this.userLogs.add(userLog);
@@ -58,6 +60,7 @@ public abstract class StatsPaymentConsumer implements Consumer {
         }
 
         if (this.userLogs.size() > 0) this.savePaymentState();
+
         logger.info("StatsPaymentConsumer is exit ..");
     }
 

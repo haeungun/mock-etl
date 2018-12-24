@@ -4,7 +4,7 @@ import com.example.mocketl.ApplicationConfig;
 import com.example.mocketl.ApplicationContext;
 import com.example.mocketl.exceptions.MockEtlJsonConvertException;
 import com.example.mocketl.model.UserLog;
-import com.example.mocketl.queue.MemoryQueue;
+import com.example.mocketl.queue.TopicQueue;
 import com.example.mocketl.util.IRequest;
 import com.example.mocketl.util.JsonParser;
 import org.json.JSONArray;
@@ -20,7 +20,7 @@ public class UserApiProducer implements Producer {
     private static final Logger logger = LoggerFactory.getLogger(UserApiProducer.class);
 
     private final ApplicationContext context;
-    private final MemoryQueue<UserLog> queue;
+    private final TopicQueue<UserLog> queue;
 
     private final IRequest request;
     private final JsonParser parser;
@@ -28,7 +28,7 @@ public class UserApiProducer implements Producer {
     private final String path;
     private final Map<String, String> token;
 
-    public UserApiProducer(ApplicationContext context, MemoryQueue<UserLog> queue, IRequest request) {
+    public UserApiProducer(ApplicationContext context, TopicQueue<UserLog> queue, IRequest request) {
         this.context = context;
         this.queue = queue;
 
@@ -43,9 +43,8 @@ public class UserApiProducer implements Producer {
     public void run() {
         try {
             String response = this.request.requestGet(this.path, this.token);
-            logger.info(response);
             List<UserLog> documents = this.convertStrToUserLogs(response);
-            List<String> topics = this.queue.getTopics();
+            String[] topics = this.context.getConfig().getTopicNames();
 
             for (UserLog document : documents) {
                 for (String topic : topics) {
@@ -62,7 +61,7 @@ public class UserApiProducer implements Producer {
             logger.error(e.getMessage());
         } catch (Exception e) {
             // TODO handling error
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

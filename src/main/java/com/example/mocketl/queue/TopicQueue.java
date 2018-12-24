@@ -1,7 +1,5 @@
 package com.example.mocketl.queue;
 
-import java.util.List;
-
 public interface TopicQueue<T> {
 
     /**
@@ -22,7 +20,4 @@ public interface TopicQueue<T> {
      */
     T consume(String topicName, int timeout);
 
-    List<String> getTopics();
-
-    int topicSize(String topicName);
 }

@@ -1,7 +1,7 @@
 package com.example.mocketl.database;
 
-import com.example.mocketl.model.StatsPayment;
+import com.example.mocketl.model.PaymentStats;
 
 public interface PaymentDao {
-    int insertOne(StatsPayment statsPayment);
+    int insertOne(PaymentStats statsPayment);
 }

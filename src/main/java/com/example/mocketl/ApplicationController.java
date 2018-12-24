@@ -5,10 +5,9 @@ import com.example.mocketl.enums.ExecuteState;
 import com.example.mocketl.model.UserLog;
 import com.example.mocketl.producer.ProducerHandler;
 import com.example.mocketl.queue.MemoryQueue;
+import com.example.mocketl.queue.TopicQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 public class ApplicationController {
 	private static final Logger logger = LoggerFactory.getLogger(ApplicationController.class);
@@ -16,14 +15,13 @@ public class ApplicationController {
 	private ApplicationContext context;
 	private ProducerHandler producerHandler;
 	private ConsumerHandler consumerHandler;
-	private MemoryQueue<UserLog> queue;
+	private TopicQueue<UserLog> queue;
 	
-	public ApplicationController() throws Exception {
+	public ApplicationController() {
 		this.context = new ApplicationContext();
 
         int capacity = this.context.getConfig().getQueueCapacity();
         this.queue = new MemoryQueue<>(capacity);
-        this.createTopics();
 
 		this.producerHandler = new ProducerHandler(this.context, this.queue);
 		this.consumerHandler = new ConsumerHandler(this.context, this.queue);
@@ -74,13 +72,5 @@ public class ApplicationController {
 		logger.info("Application is stopped :D");
 		return true;
 	}
-
-	private List<String> createTopics() {
-        String[] topics = this.context.getConfig().getTopicNames();
-        for (String topic : topics) {
-            this.queue.createTopic(topic);
-        }
-        return this.queue.getTopics();
-    }
 
 }
