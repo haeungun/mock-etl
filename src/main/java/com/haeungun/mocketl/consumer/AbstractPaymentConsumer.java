@@ -43,7 +43,7 @@ public abstract class AbstractPaymentConsumer implements Consumer {
             try {
                 userLog = this.queue.consume(this.topicName, this.pollTimeout);
                 if (userLog != null) {
-                    logger.info(userLog.toString());
+                    logger.info("Topic[" + this.topicName + "] " + userLog.toString());
                     this.userLogs.add(userLog);
                 }
 
