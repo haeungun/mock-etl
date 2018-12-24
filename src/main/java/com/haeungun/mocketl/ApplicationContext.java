@@ -4,28 +4,28 @@ import com.haeungun.mocketl.enums.ExecuteState;
 
 public class ApplicationContext {
 
-	private final ApplicationConfig config;
-	private ExecuteState executeState;
-	
-	public ApplicationContext() {
-		this.config = new ApplicationConfig();
-		this.executeState = ExecuteState.READY;
-	}
+    private final ApplicationConfig config;
+    private ExecuteState executeState;
 
-	public void setState(ExecuteState state) {
-		this.setConsumerState(state);
-	}
-	
-	public void setConsumerState(ExecuteState state) {
-		this.executeState = state;
-	}
+    public ApplicationContext() {
+        this.config = new ApplicationConfig();
+        this.executeState = ExecuteState.READY;
+    }
 
-	public boolean isRunning() {
-		return ExecuteState.RUNNING == this.executeState;
-	}
-	
-	public ApplicationConfig getConfig() {
-		return this.config;
-	}
+    public void setState(ExecuteState state) {
+        this.setConsumerState(state);
+    }
+
+    public void setConsumerState(ExecuteState state) {
+        this.executeState = state;
+    }
+
+    public boolean isRunning() {
+        return ExecuteState.RUNNING == this.executeState;
+    }
+
+    public ApplicationConfig getConfig() {
+        return this.config;
+    }
 
 }
