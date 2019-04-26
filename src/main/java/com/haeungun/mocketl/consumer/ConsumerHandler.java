@@ -25,7 +25,7 @@ public class ConsumerHandler {
         this.executor = Executors.newCachedThreadPool();
     }
 
-    public boolean registerProducer() {
+    public boolean registerConsumer() {
         try {
             this.registerStatsCountryConsumer();
             this.registerStatsGenderConsumer();

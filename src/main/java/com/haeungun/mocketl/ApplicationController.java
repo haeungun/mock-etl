@@ -41,7 +41,7 @@ public class ApplicationController {
             return false;
         }
 
-        if (!this.consumerHandler.registerProducer()) {
+        if (!this.consumerHandler.registerConsumer()) {
             logger.error("Failed to register consumer !!");
             return false;
         }
