@@ -5,7 +5,7 @@ import com.haeungun.mocketl.enums.ExecuteState;
 public class ApplicationContext {
 
     private final ApplicationConfig config;
-    private ExecuteState executeState;
+    private volatile ExecuteState executeState;
 
     public ApplicationContext() {
         this.config = new ApplicationConfig();
